@@ -20,7 +20,13 @@ sudo apt install -y xorg openbox chromium python3-venv python3-pip unclutter
 echo ""
 echo "[2/7] Creando entorno virtual Python..."
 cd "$PROJECT_DIR"
-python3 -m venv venv
+
+if ! python3 -m venv venv 2>/dev/null; then
+    echo "[WARN] Falló python3 -m venv. Instalando python3-venv..."
+    sudo apt install -y python3.12-venv python3.12-dev
+    python3 -m venv venv
+fi
+
 source venv/bin/activate
 pip install --upgrade pip
 pip install -r requirements.txt
@@ -35,10 +41,10 @@ echo ""
 echo "[4/7] Configurando auto-login en tty1..."
 GETTY_OVERRIDE_DIR="/etc/systemd/system/getty@tty1.service.d"
 sudo mkdir -p "$GETTY_OVERRIDE_DIR"
-sudo tee "$GETTY_OVERRIDE_DIR/override.conf" > /dev/null <<'EOF'
+sudo tee "$GETTY_OVERRIDE_DIR/override.conf" > /dev/null <<EOF
 [Service]
 ExecStart=
-ExecStart=-/sbin/agetty --autologin pi --noclear %I 38400 linux
+ExecStart=-/sbin/agetty --autologin $CURRENT_USER --noclear %I 38400 linux
 EOF
 
 echo ""
@@ -52,8 +58,8 @@ xset -dpms
 xset s noblank
 xset s off
 
-(sleep 2 && systemctl --user start monitor-kiosk) &
-(sleep 3 && '"$PROJECT_DIR"'/kiosk.sh) &
+(sleep 2 && systemctl --user restart monitor-kiosk) &
+(sleep 3 && DESTDIR="$HOME/projects/monitor-raspi" && "$DESTDIR"/kiosk.sh) &
 EOF
 
 cat > ~/.bash_profile <<'EOF'

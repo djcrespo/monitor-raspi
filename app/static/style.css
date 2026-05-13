@@ -5,13 +5,13 @@
 }
 
 html {
-    width: 100%;
-    height: 100%;
+    width: auto;
+    height: auto;
     overflow: hidden;
     background: #0d1117;
 }
 
-body {
+/* body {
     width: 100vh;
     height: 100vw;
     overflow: hidden;
@@ -23,13 +23,26 @@ body {
     position: fixed;
     top: 0;
     left: 0;
+} */
+
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    /* transform: translateX(100vw) rotate(90deg);
+    transform-origin: top left;
+    position: fixed; */
 }
+
 
 .dashboard {
     display: flex;
     flex-direction: column;
-    height: 100vh;
-    width: 100vw;
+    height: 100%;
+    width: 100%;
 }
 
 .clima-seccion {

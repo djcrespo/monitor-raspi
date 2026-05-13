@@ -12,4 +12,7 @@ CHROME_FLAGS=(
     --disk-cache-dir=/tmp/chromium-cache
 )
 
-exec chromium-browser "${CHROME_FLAGS[@]}" http://localhost:5000
+while true; do
+    chromium "${CHROME_FLAGS[@]}" http://localhost:5000
+    sleep 2
+done

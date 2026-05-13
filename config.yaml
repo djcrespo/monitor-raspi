@@ -1,0 +1,11 @@
+geolocation:
+  latitude: 21.016670030245
+  longitude: -89.725788249961
+  ciudad: Yucatán
+
+gallery:
+  folder: ~/Pictures/kiosk-gallery/
+  refresh_interval: 30
+
+weather:
+  refresh_interval: 900

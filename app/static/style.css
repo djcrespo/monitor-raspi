@@ -1,0 +1,245 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.dashboard {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+}
+
+.clima-seccion {
+    flex: 0 0 auto;
+    padding: 30px 25px 20px;
+    border-bottom: 1px solid #21262d;
+    background: linear-gradient(180deg, #0d1117 0%, #161b22 100%);
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 15px;
+}
+
+.reloj {
+    font-size: 3.5rem;
+    font-weight: 200;
+    letter-spacing: -2px;
+    color: #e6edf3;
+}
+
+.fecha {
+    font-size: 0.95rem;
+    color: #8b949e;
+    margin-top: 4px;
+}
+
+.ciudad {
+    font-size: 1.1rem;
+    color: #8b949e;
+    text-align: right;
+}
+
+.clima-actual {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.icono-grande {
+    font-size: 4rem;
+    line-height: 1;
+}
+
+.temp-principal {
+    font-size: 3.5rem;
+    font-weight: 300;
+}
+
+.temp-principal span {
+    font-size: 1.8rem;
+    font-weight: 400;
+    vertical-align: super;
+}
+
+.sensacion {
+    font-size: 1rem;
+    color: #8b949e;
+    margin-left: auto;
+}
+
+.sensacion span {
+    color: #e6edf3;
+}
+
+.titulo-seccion {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #484f58;
+    margin-bottom: 10px;
+}
+
+.pronostico {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 5px;
+}
+
+.pronostico::-webkit-scrollbar {
+    height: 4px;
+}
+
+.pronostico::-webkit-scrollbar-track {
+    background: #161b22;
+}
+
+.pronostico::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 2px;
+}
+
+.dia-pronostico {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 14px;
+    background: #161b22;
+    border-radius: 10px;
+    border: 1px solid #21262d;
+    min-width: 70px;
+}
+
+.dia-nombre {
+    font-weight: 600;
+    font-size: 0.85rem;
+}
+
+.icono-chico {
+    font-size: 1.5rem;
+}
+
+.temp-max {
+    font-weight: 600;
+    color: #e6edf3;
+    font-size: 0.9rem;
+}
+
+.temp-min {
+    color: #484f58;
+    font-size: 0.8rem;
+}
+
+.galeria-seccion {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background: #0d1117;
+    min-height: 0;
+}
+
+.galeria-header {
+    padding: 15px 20px 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.galeria-titulo {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: #484f58;
+}
+
+.galeria-num {
+    font-size: 0.8rem;
+    color: #484f58;
+}
+
+.slideshow {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.slideshow img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    background: #0d1117;
+    opacity: 0;
+    transition: opacity 1.2s ease-in-out;
+}
+
+.slideshow img.active {
+    opacity: 1;
+}
+
+.sin-imagenes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: #484f58;
+}
+
+.sin-imagenes-icono {
+    font-size: 3.5rem;
+    margin-bottom: 12px;
+    opacity: 0.5;
+}
+
+.sin-imagenes-texto {
+    font-size: 0.9rem;
+}
+
+.sin-imagenes-ruta {
+    font-size: 0.75rem;
+    color: #30363d;
+    margin-top: 5px;
+}
+
+.error-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #f85149;
+    color: white;
+    text-align: center;
+    padding: 8px;
+    font-size: 0.85rem;
+    display: none;
+    z-index: 100;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(5px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.clima-actual, .dia-pronostico, .reloj {
+    animation: fadeIn 0.6s ease-out;
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor Kiosk</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div id="error-banner"></div>
+
+    <div class="dashboard">
+        <div class="clima-seccion">
+            <div class="header">
+                <div>
+                    <div id="reloj" class="reloj">--:--</div>
+                    <div id="fecha" class="fecha"></div>
+                    <div id="actualizando" class="actualizando"></div>
+                </div>
+                <div id="ciudad-display" class="ciudad"></div>
+            </div>
+
+            <div id="clima-actual" class="clima-actual">
+                <div class="icono-grande">⏳</div>
+                <div class="temp-principal">--<span>°C</span></div>
+                <div class="sensacion">Sensación: <span>--°C</span></div>
+            </div>
+
+            <div class="divisor"></div>
+
+            <div>
+                <div class="titulo-seccion">Pronóstico</div>
+                <div id="pronostico" class="pronostico"></div>
+            </div>
+        </div>
+
+        <div class="galeria-seccion">
+            <div class="galeria-header">
+                <span class="galeria-titulo">Galería</span>
+                <span id="galeria-count" class="galeria-num"></span>
+            </div>
+            <div id="slideshow-container" class="slideshow"></div>
+        </div>
+    </div>
+
+    <div class="estado">Actualizado</div>
+
+    <script src="/static/app.js"></script>
+</body>
+</html>

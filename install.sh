@@ -37,8 +37,10 @@ mkdir -p ~/Pictures/kiosk-gallery
 mkdir -p ~/.config/openbox
 mkdir -p ~/.config/systemd/user
 
+chmod +x "$PROJECT_DIR/rotate-display.sh"
+
 echo ""
-echo "[4/7] Configurando auto-login en tty1..."
+echo "[4/8] Configurando auto-login en tty1..."
 GETTY_OVERRIDE_DIR="/etc/systemd/system/getty@tty1.service.d"
 sudo mkdir -p "$GETTY_OVERRIDE_DIR"
 sudo tee "$GETTY_OVERRIDE_DIR/override.conf" > /dev/null <<EOF
@@ -48,7 +50,7 @@ ExecStart=-/sbin/agetty --autologin $CURRENT_USER --noclear %I 38400 linux
 EOF
 
 echo ""
-echo "[5/7] Configurando X11 y Openbox..."
+echo "[5/8] Configurando X11 y Openbox..."
 cat > ~/.xinitrc <<'EOF'
 exec openbox-session
 EOF
@@ -58,8 +60,10 @@ xset -dpms
 xset s noblank
 xset s off
 
+DESTDIR="$HOME/projects/monitor-raspi"
+(sleep 2 && "$DESTDIR"/rotate-display.sh left) &
 (sleep 2 && systemctl --user restart monitor-kiosk) &
-(sleep 3 && DESTDIR="$HOME/projects/monitor-raspi" && "$DESTDIR"/kiosk.sh) &
+(sleep 3 && "$DESTDIR"/kiosk.sh) &
 EOF
 
 cat > ~/.bash_profile <<'EOF'
@@ -69,7 +73,7 @@ fi
 EOF
 
 echo ""
-echo "[6/7] Creando servicio systemd para el servidor Flask..."
+echo "[6/8] Creando servicio systemd para el servidor Flask..."
 cat > ~/.config/systemd/user/monitor-kiosk.service <<'EOF'
 [Unit]
 Description=Monitor Kiosk Flask Server
@@ -92,7 +96,7 @@ systemctl --user daemon-reload
 systemctl --user enable monitor-kiosk
 
 echo ""
-echo "[7/7] Configurando Chromium preferences..."
+echo "[7/8] Configurando Chromium preferences..."
 CHROME_PREFS_DIR="$HOME/.config/chromium/Default"
 mkdir -p "$CHROME_PREFS_DIR"
 cat > "$CHROME_PREFS_DIR/Preferences" <<'EOF'

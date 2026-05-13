@@ -49,6 +49,97 @@ El script instala:
 - Configura auto-login en tty1
 - Crea el servicio systemd para Flask
 
+## Desarrollo local
+
+Para editar y depurar el dashboard desde tu PC sin necesidad de la Raspi:
+
+### 1. Crear entorno virtual e instalar dependencias
+
+```bash
+cd monitor-raspi
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+### 2. Crear carpeta de imágenes de prueba
+
+```bash
+mkdir -p ~/Pictures/kiosk-gallery
+# Copiá algunas imágenes .jpg o .png para probar la galería
+```
+
+### 3. Iniciar el servidor
+
+```bash
+cd app
+python3 server.py
+```
+
+El servidor arranca en `http://localhost:5000`.
+
+### 4. Modo horizontal vs vertical
+
+El CSS por defecto incluye una rotación de 90° para pantalla vertical
+(como se usa en la Raspi). Para depurar en horizontal en tu PC,
+**comentá** estas líneas en `app/static/style.css`:
+
+```css
+/* Comentar para depuración horizontal */
+/*
+body {
+    width: 100vh;
+    height: 100vw;
+    transform: translateX(100vw) rotate(90deg);
+    transform-origin: top left;
+    position: fixed;
+    top: 0;
+    left: 0;
+}
+*/
+
+/* Descomentar para depuración horizontal */
+body {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+```
+
+Para simular pantalla vertical sin tocar el CSS, usá las DevTools del
+navegador (F12) → Toggle device toolbar (Ctrl+Shift+M) → elegí una
+resolución tipo 1080×1920.
+
+### 5. Recarga automática (opcional)
+
+Instalá watchdog para recargar el servidor al guardar cambios:
+
+```bash
+pip install watchdog
+```
+
+Y ejecutá Flask con modo debug:
+
+```bash
+flask --app server run --debug --host 0.0.0.0 --port 5000
+```
+
+### 6. Configurar ubicación para pruebas
+
+Editá `config.yaml` con coordenadas de prueba:
+
+```yaml
+geolocation:
+  latitude: 21.0166
+  longitude: -89.7257
+  ciudad: Yucatán
+```
+
+Si dejás los valores en `null`, la ubicación se detecta automáticamente por IP.
+
 ## Después de instalar
 
 ### 1. Agregar imágenes a la galería

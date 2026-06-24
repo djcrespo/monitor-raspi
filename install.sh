@@ -13,17 +13,17 @@ if [ "$EUID" -eq 0 ]; then
     exit 1
 fi
 
-echo "[1/7] Instalando paquetes del sistema..."
+echo "[1/5] Instalando paquetes del sistema..."
 sudo apt update
-sudo apt install -y xorg openbox chromium python3-venv python3-pip unclutter
+sudo apt install -y python3-venv python3-pip unclutter
 
 echo ""
-echo "[2/7] Creando entorno virtual Python..."
+echo "[2/5] Creando entorno virtual Python..."
 cd "$PROJECT_DIR"
 
 if ! python3 -m venv venv 2>/dev/null; then
     echo "[WARN] Falló python3 -m venv. Instalando python3-venv..."
-    sudo apt install -y python3.12-venv python3.12-dev
+    sudo apt install -y python3-venv
     python3 -m venv venv
 fi
 
@@ -32,49 +32,14 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 echo ""
-echo "[3/7] Creando estructura de carpetas..."
+echo "[3/5] Creando estructura de carpetas..."
 mkdir -p ~/Pictures/kiosk-gallery
-mkdir -p ~/.config/openbox
 mkdir -p ~/.config/systemd/user
-
-chmod +x "$PROJECT_DIR/rotate-display.sh"
-
-echo ""
-echo "[4/8] Configurando auto-login en tty1..."
-GETTY_OVERRIDE_DIR="/etc/systemd/system/getty@tty1.service.d"
-sudo mkdir -p "$GETTY_OVERRIDE_DIR"
-sudo tee "$GETTY_OVERRIDE_DIR/override.conf" > /dev/null <<EOF
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty --autologin $CURRENT_USER --noclear %I 38400 linux
-EOF
+mkdir -p ~/.config/autostart
 
 echo ""
-echo "[5/8] Configurando X11 y Openbox..."
-cat > ~/.xinitrc <<'EOF'
-exec openbox-session
-EOF
-
-cat > ~/.config/openbox/autostart <<'EOF'
-xset -dpms
-xset s noblank
-xset s off
-
-DESTDIR="$HOME/projects/monitor-raspi"
-(sleep 2 && "$DESTDIR"/rotate-display.sh left) &
-(sleep 2 && systemctl --user restart monitor-kiosk) &
-(sleep 3 && "$DESTDIR"/kiosk.sh) &
-EOF
-
-cat > ~/.bash_profile <<'EOF'
-if [ -z "$WAYLAND_DISPLAY" ] && [ "$XDG_VTNR" -eq 1 ]; then
-    exec startx
-fi
-EOF
-
-echo ""
-echo "[6/8] Creando servicio systemd para el servidor Flask..."
-cat > ~/.config/systemd/user/monitor-kiosk.service <<'EOF'
+echo "[4/5] Creando servicio systemd para el servidor Flask..."
+cat > ~/.config/systemd/user/monitor-kiosk.service <<EOF
 [Unit]
 Description=Monitor Kiosk Flask Server
 After=network.target
@@ -96,7 +61,18 @@ systemctl --user daemon-reload
 systemctl --user enable monitor-kiosk
 
 echo ""
-echo "[7/8] Configurando Chromium preferences..."
+echo "[5/5] Configurando auto-arranque de Chromium kiosk..."
+
+# Detectar el nombre del binario de Chromium disponible
+if command -v chromium >/dev/null 2>&1; then
+    CHROME_BIN="chromium"
+elif command -v chromium-browser >/dev/null 2>&1; then
+    CHROME_BIN="chromium-browser"
+else
+    echo "[WARN] No se encontró chromium ni chromium-browser. El .desktop quedará configurado con 'chromium'."
+    CHROME_BIN="chromium"
+fi
+
 CHROME_PREFS_DIR="$HOME/.config/chromium/Default"
 mkdir -p "$CHROME_PREFS_DIR"
 cat > "$CHROME_PREFS_DIR/Preferences" <<'EOF'
@@ -111,21 +87,29 @@ cat > "$CHROME_PREFS_DIR/Preferences" <<'EOF'
 }
 EOF
 
+cat > ~/.config/autostart/monitor-kiosk.desktop <<EOF
+[Desktop Entry]
+Type=Application
+Name=Monitor Kiosk
+Comment=Navegador en modo kiosk para el dashboard
+Exec=$CHROME_BIN --kiosk --no-first-run --no-default-browser-check --disable-infobars --disable-session-crashed-bubble --disable-dev-shm-usage --start-fullscreen --disk-cache-dir=/tmp/chromium-cache http://localhost:5000
+X-GNOME-Autostart-enabled=true
+EOF
+
 echo ""
 echo "=== Instalación completa ==="
 echo ""
 echo "Resumen:"
-echo "  - Paquetes: X11, Openbox, Chromium instalados"
 echo "  - Entorno Python: venv en $PROJECT_DIR/venv"
 echo "  - Servicio: monitor-kiosk.service habilitado"
 echo "  - Galería: ~/Pictures/kiosk-gallery/"
-echo "  - Auto-arranque: Configurado para usuario $CURRENT_USER"
+echo "  - Auto-arranque: ~/.config/autostart/monitor-kiosk.desktop"
+echo "  - Usuario: $CURRENT_USER"
 echo ""
-echo "Para que el auto-login funcione, verifica que el archivo"
-echo "/etc/systemd/system/getty@tty1.service.d/override.conf"
-echo "tenga el nombre de usuario correcto."
+echo "Pasos siguientes:"
+echo "  1. Copiar imágenes a ~/Pictures/kiosk-gallery/"
+echo "  2. Configurar URL del calendario de Apple en config.yaml"
+echo "  3. Reiniciar: sudo reboot"
 echo ""
-echo "Reinicia para probar: sudo reboot"
-echo ""
-echo "Si necesitas cambiar la ubicación manualmente, edita config.yaml"
-echo "con tus coordenadas (lat, lon) y ciudad."
+echo "Para ver el estado del servicio:"
+echo "  systemctl --user status monitor-kiosk"

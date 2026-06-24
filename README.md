@@ -1,11 +1,12 @@
 # Monitor Kiosk - Raspberry Pi 4
 
-Dashboard de clima + galería de fotos para pantalla completa en Raspberry Pi 4 (8GB).
+Dashboard de clima, pronóstico, calendario y galería de fotos para pantalla completa en Raspberry Pi 4 (8GB) con RaspiOS 64-bit.
 
 ## Requisitos
 
-- Raspberry Pi 4 con Debian 13 (Trixie)
-- Conexión a internet (para consultas de clima y ubicación)
+- Raspberry Pi 4 con RaspiOS 64-bit
+- Escritorio gráfico con Chromium instalado
+- Conexión a internet (para consultas de clima, ubicación y calendario)
 - Usuario con acceso sudo
 
 ## Estructura del proyecto
@@ -13,20 +14,20 @@ Dashboard de clima + galería de fotos para pantalla completa en Raspberry Pi 4 
 ```
 monitor-raspi/
 ├── app/
-│   ├── server.py          # Servidor Flask (puerto 5000)
-│   ├── weather.py        # Cliente Open-Meteo
-│   ├── location.py       # Geolocalización por IP
-│   ├── gallery.py        # Escáner de carpeta de galería
+│   ├── server.py              # Servidor Flask (puerto 5000)
+│   ├── weather.py            # Cliente Open-Meteo
+│   ├── location.py           # Geolocalización por IP
+│   ├── gallery.py            # Escáner de carpeta de galería
+│   ├── calendar_service.py   # Parser de calendarios ICS (Apple, Google, etc.)
 │   ├── templates/
-│   │   └── index.html    # Dashboard HTML
+│   │   └── index.html        # Dashboard HTML
 │   └── static/
-│       ├── style.css     # Estilos (dark theme)
-│       └── app.js        # JavaScript del frontend
-├── config.yaml           # Configuración
-├── requirements.txt      # Dependencias Python
-├── install.sh            # Script de instalación
-├── kiosk.sh              # Lanzador de Chromium kiosk
-└── README.md             # Este archivo
+│       ├── style.css         # Estilos (dark theme)
+│       └── app.js            # JavaScript del frontend
+├── config.yaml               # Configuración
+├── requirements.txt          # Dependencias Python
+├── install.sh                # Script de instalación
+└── README.md                 # Este archivo
 ```
 
 ## Instalación rápida
@@ -43,11 +44,12 @@ chmod +x install.sh
 ```
 
 El script instala:
-- X11 + Openbox
-- Chromium Browser
 - Python 3 con venv
-- Configura auto-login en tty1
-- Crea el servicio systemd para Flask
+- Dependencias del proyecto (`flask`, `requests`, `pyyaml`, `icalendar`, `recurring-ical-events`)
+- Servicio systemd `--user` para Flask (`monitor-kiosk`)
+- Archivo `~/.config/autostart/monitor-kiosk.desktop` para lanzar Chromium al iniciar sesión
+
+> **Nota:** Este instalador asume que la Raspi ya tiene escritorio gráfico y Chromium. No instala X11 ni Openbox.
 
 ## Desarrollo local
 
@@ -78,40 +80,12 @@ python3 server.py
 
 El servidor arranca en `http://localhost:5000`.
 
-### 4. Modo horizontal vs vertical
+### 4. Modo vertical
 
-El CSS por defecto incluye una rotación de 90° para pantalla vertical
-(como se usa en la Raspi). Para depurar en horizontal en tu PC,
-**comentá** estas líneas en `app/static/style.css`:
+La orientación vertical debe configurarse en RaspiOS (`Preferences` → `Screen Configuration`).
+Para depurar en horizontal en tu PC, el CSS ya funciona en modo horizontal por defecto.
 
-```css
-/* Comentar para depuración horizontal */
-/*
-body {
-    width: 100vh;
-    height: 100vw;
-    transform: translateX(100vw) rotate(90deg);
-    transform-origin: top left;
-    position: fixed;
-    top: 0;
-    left: 0;
-}
-*/
-
-/* Descomentar para depuración horizontal */
-body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #0d1117;
-    color: #e6edf3;
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
-```
-
-Para simular pantalla vertical sin tocar el CSS, usá las DevTools del
-navegador (F12) → Toggle device toolbar (Ctrl+Shift+M) → elegí una
-resolución tipo 1080×1920.
+Para simular pantalla vertical sin tocar el CSS, usá las DevTools del navegador (F12) → Toggle device toolbar (Ctrl+Shift+M) → elegí una resolución tipo 1080×1920.
 
 ### 5. Recarga automática (opcional)
 
@@ -151,7 +125,28 @@ mkdir -p ~/Pictures/kiosk-gallery
 
 Formatos soportados: `.jpg`, `.jpeg`, `.png`, `.gif`, `.webp`, `.bmp`
 
-### 2. Configurar ubicación manual (opcional)
+### 2. Configurar calendario de Apple
+
+El dashboard puede mostrar eventos de cualquier calendario ICS, incluyendo Apple Calendar.
+
+Para compartir un calendario de Apple:
+1. Abrí la app Calendario en Mac/iPhone/iPad
+2. Seleccioná el calendario → Compartir calendario → Calendario público
+3. Copiá la URL generada (empieza con `webcal://`)
+4. Pegala en `config.yaml`:
+
+```yaml
+calendar:
+  enabled: true
+  url: "https://p123-caldav.icloud.com/published/2/..."
+  refresh_interval: 3600   # segundos
+  max_events: 7
+  days_ahead: 14
+```
+
+> También podés usar una URL `webcal://...`; el servidor la convierte automáticamente a `https://`.
+
+### 3. Configurar ubicación manual (opcional)
 
 Editar `config.yaml`:
 
@@ -164,7 +159,7 @@ geolocation:
 
 Si no se especifica, se detecta automáticamente por IP.
 
-### 3. Reiniciar
+### 4. Reiniciar
 
 ```bash
 sudo reboot
@@ -172,15 +167,15 @@ sudo reboot
 
 ## Cómo funciona
 
-1. Al boot, el sistema hace auto-login en tty1 y lanza X11
-2. Openbox inicia y ejecuta `autostart`
-3. El servicio `monitor-kiosk` arranca el servidor Flask
-4. Chromium se abre en modo kiosk mostrando `localhost:5000`
-5. El servidor consulta:
+1. Al iniciar sesión en el escritorio, el servicio `monitor-kiosk` arranca el servidor Flask
+2. Chromium se abre automáticamente en modo kiosk mostrando `localhost:5000` vía autostart
+3. El servidor consulta:
    - **Ubicación**: ip-api.com (o `config.yaml` si está definido)
    - **Clima**: Open-Meteo API (gratis, sin API key)
-6. El frontend actualiza:
+   - **Calendario**: feed ICS configurado en `config.yaml`
+4. El frontend actualiza:
    - Clima cada 15 minutos
+   - Calendario cada 1 hora
    - Imágenes cada 30 segundos
    - Reloj en tiempo real
 
@@ -196,17 +191,14 @@ journalctl --user -u monitor-kiosk -f
 # Reiniciar el servicio
 systemctl --user restart monitor-kiosk
 
-# Ver logs del servidor Flask en vivo
-tail -f ~/.config/systemd/user/monitor-kiosk.service.d/var-log-monitor-kiosk.log
+# Verificar que Flask responda
+curl http://localhost:5000
+
+# Probar el endpoint de calendario
+curl http://localhost:5000/api/calendar
 ```
 
 ## Solución de problemas
-
-### La pantalla queda en negro después del boot
-
-1. Conectar por SSH
-2. Verificar que X11 arranque: `cat ~/.config/openbox/autostart`
-3. Revisar logs: `journalctl -xe`
 
 ### Chromium no muestra la página
 
@@ -229,6 +221,16 @@ https://www.latlong.net/
 1. Verificar que la carpeta existe: `ls ~/Pictures/kiosk-gallery/`
 2. Verificar permisos: `chmod 755 ~/Pictures/kiosk-gallery/`
 3. Reiniciar el servicio: `systemctl --user restart monitor-kiosk`
+
+### El calendario no muestra eventos
+
+1. Verificar que `calendar.enabled` sea `true` en `config.yaml`
+2. Verificar la URL del calendario:
+   ```bash
+   curl http://localhost:5000/api/calendar
+   ```
+3. Asegurarte de que el calendario de Apple esté compartido como público
+4. Revisar logs: `journalctl --user -u monitor-kiosk -f`
 
 ### El kiosk se cierra solo
 
@@ -253,11 +255,14 @@ weather:
 
 gallery:
   refresh_interval: 60   # segundos
+
+calendar:
+  refresh_interval: 3600 # segundos
 ```
 
 ### Cambiar tiempo del slideshow
 
-En `app/static/app.js`, línea 3:
+En `app/static/app.js`, línea 4:
 
 ```javascript
 const SLIDESHOW_INTERVAL = 8 * 1000;  // milisegundos

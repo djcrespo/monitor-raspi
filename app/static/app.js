@@ -1,5 +1,6 @@
 const CLIMA_INTERVAL = 15 * 60 * 1000;
 const GALERIA_INTERVAL = 30 * 1000;
+const CALENDARIO_INTERVAL = 60 * 60 * 1000;
 const SLIDESHOW_INTERVAL = 8 * 1000;
 
 let currentImageIndex = 0;
@@ -83,7 +84,7 @@ function renderGaleria() {
         container.innerHTML = `
             <div class="sin-imagenes">
                 <div class="sin-imagenes-icono">🖼️</div>
-                <div class="sin-imagenes-texto">Sin imágenes en la galería</div>
+                <div class="sin-imagenes-texto">No hay fotos disponibles</div>
                 <div class="sin-imagenes-ruta">~/Pictures/kiosk-gallery/</div>
             </div>
         `;
@@ -95,6 +96,65 @@ function renderGaleria() {
     ).join("");
 
     document.getElementById("galeria-count").textContent = `${imagenes.length} foto${imagenes.length !== 1 ? "s" : ""}`;
+}
+
+async function fetchCalendario() {
+    try {
+        const resp = await fetch("/api/calendar");
+        if (!resp.ok) throw new Error("HTTP " + resp.status);
+        const data = await resp.json();
+        renderCalendario(data);
+    } catch (e) {
+        console.warn("Error consultando calendario:", e);
+    }
+}
+
+function renderCalendario(data) {
+    const seccion = document.getElementById("calendario-seccion");
+    const contenedor = document.getElementById("calendario-eventos");
+
+    if (!data.enabled) {
+        seccion.style.display = "none";
+        return;
+    }
+
+    seccion.style.display = "";
+    const eventos = data.eventos || [];
+
+    if (eventos.length === 0) {
+        contenedor.innerHTML = `
+            <div class="sin-eventos">
+                <span>📅</span>
+                <span>Sin eventos próximos</span>
+            </div>
+        `;
+        return;
+    }
+
+    contenedor.innerHTML = eventos.map(e => {
+        const hoy = esHoy(e.fecha_dia);
+        const horaHtml = e.hora ? `<span class="evento-hora">${e.hora}</span>` : "";
+        return `
+            <div class="evento-item ${hoy ? "evento-hoy" : ""}">
+                <div class="evento-fecha">
+                    <span class="evento-dia-nombre">${e.dia_semana}</span>
+                    <span class="evento-dia-numero">${e.fecha_dia.split("-")[2]}</span>
+                </div>
+                <div class="evento-info">
+                    <div class="evento-titulo">${e.titulo}</div>
+                    ${horaHtml}
+                </div>
+            </div>
+        `;
+    }).join("");
+}
+
+function esHoy(fechaDia) {
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoy.getDate()).padStart(2, "0");
+    return fechaDia === `${yyyy}-${mm}-${dd}`;
 }
 
 function nextImage() {
@@ -132,6 +192,9 @@ function init() {
 
     fetchGaleria();
     setInterval(fetchGaleria, GALERIA_INTERVAL);
+
+    fetchCalendario();
+    setInterval(fetchCalendario, CALENDARIO_INTERVAL);
 
     setInterval(nextImage, SLIDESHOW_INTERVAL);
 }

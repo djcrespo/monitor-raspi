@@ -1,0 +1,21 @@
+# Entorno virtual
+venv/
+.venv/
+
+# Python
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+*.swp

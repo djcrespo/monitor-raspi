@@ -9,3 +9,10 @@ gallery:
 
 weather:
   refresh_interval: 900
+
+calendar:
+  enabled: false
+  url: ""
+  refresh_interval: 3600
+  max_events: 7
+  days_ahead: 14

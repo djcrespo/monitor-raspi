@@ -47,7 +47,7 @@ body {
 
 .clima-seccion {
     flex: 0 0 auto;
-    padding: 20px 25px 15px;
+    padding: 16px 22px 12px;
     display: flex;
     flex-direction: column;
     border-bottom: 1px solid #21262d;
@@ -62,7 +62,7 @@ body {
 }
 
 .reloj {
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: 200;
     letter-spacing: -2px;
     color: #e6edf3;
@@ -83,28 +83,28 @@ body {
 .clima-actual {
     display: flex;
     align-items: center;
-    gap: 18px;
-    margin-bottom: 12px;
+    gap: 14px;
+    margin-bottom: 10px;
 }
 
 .icono-grande {
-    font-size: 4.5rem;
+    font-size: 3.5rem;
     line-height: 1;
 }
 
 .temp-principal {
-    font-size: 5rem;
+    font-size: 4rem;
     font-weight: 300;
 }
 
 .temp-principal span {
-    font-size: 2.5rem;
+    font-size: 2rem;
     font-weight: 400;
     vertical-align: super;
 }
 
 .sensacion {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     color: #8b949e;
     margin-left: auto;
 }
@@ -152,12 +152,12 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 5px;
-    padding: 12px 16px;
+    gap: 4px;
+    padding: 10px 12px;
     background: #161b22;
     border-radius: 10px;
     border: 1px solid #21262d;
-    min-width: 95px;
+    min-width: 80px;
 }
 
 .dia-nombre {
@@ -178,6 +178,108 @@ body {
 .temp-min {
     color: #484f58;
     font-size: 0.9rem;
+}
+
+.calendario-seccion {
+    flex: 0 1 auto;
+    padding: 12px 22px;
+    border-bottom: 1px solid #21262d;
+    background: #0d1117;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.calendario-eventos {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    overflow-y: auto;
+    max-height: 220px;
+    padding-right: 4px;
+}
+
+.calendario-eventos::-webkit-scrollbar {
+    width: 4px;
+}
+
+.calendario-eventos::-webkit-scrollbar-track {
+    background: #161b22;
+}
+
+.calendario-eventos::-webkit-scrollbar-thumb {
+    background: #30363d;
+    border-radius: 2px;
+}
+
+.evento-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #161b22;
+    border-radius: 10px;
+    border: 1px solid #21262d;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.evento-hoy {
+    border-color: #238636;
+    background: linear-gradient(90deg, #161b22 0%, #112119 100%);
+}
+
+.evento-fecha {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-width: 46px;
+    padding: 6px 8px;
+    background: #0d1117;
+    border-radius: 8px;
+    border: 1px solid #21262d;
+}
+
+.evento-dia-nombre {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #8b949e;
+}
+
+.evento-dia-numero {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e6edf3;
+}
+
+.evento-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.evento-titulo {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #e6edf3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.evento-hora {
+    font-size: 0.85rem;
+    color: #8b949e;
+}
+
+.sin-eventos {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 14px;
+    color: #484f58;
+    font-size: 1rem;
 }
 
 .galeria-seccion {

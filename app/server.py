@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from weather import WeatherService
 from location import LocationService
 from gallery import GalleryService
+from calendar_service import CalendarService
 
 app = Flask(__name__)
 
@@ -18,6 +19,7 @@ GALLERY_DST = os.path.expanduser("~/Pictures/kiosk-gallery")
 
 location_service = LocationService()
 gallery_service = GalleryService()
+calendar_service = CalendarService()
 
 weather_service = None
 location_data = None
@@ -56,6 +58,10 @@ def weather():
 @app.route("/api/gallery")
 def gallery():
     return jsonify({"imagenes": gallery_service.get_image_urls()})
+
+@app.route("/api/calendar")
+def calendar():
+    return jsonify(calendar_service.get_events())
 
 @app.route("/api/status")
 def status():

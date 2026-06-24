@@ -57,8 +57,12 @@ StandardError=journal
 WantedBy=default.target
 EOF
 
+echo ""
+echo "[4b/5] Habilitando linger para servicios --user en boot..."
+sudo loginctl enable-linger "$CURRENT_USER"
+
 systemctl --user daemon-reload
-systemctl --user enable monitor-kiosk
+systemctl --user enable --now monitor-kiosk
 
 echo ""
 echo "[5/5] Configurando auto-arranque de Chromium kiosk..."

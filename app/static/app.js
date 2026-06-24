@@ -111,7 +111,9 @@ async function fetchCalendario() {
 
 function renderCalendario(data) {
     const seccion = document.getElementById("calendario-seccion");
-    const contenedor = document.getElementById("calendario-eventos");
+    const grid = document.getElementById("calendario-grid");
+    const eventosHoy = document.getElementById("calendario-eventos-hoy");
+    const mesAno = document.getElementById("cal-mes-ano");
 
     if (!data.enabled) {
         seccion.style.display = "none";
@@ -120,33 +122,56 @@ function renderCalendario(data) {
 
     seccion.style.display = "";
     const eventos = data.eventos || [];
+    const hoy = new Date();
+    const anio = hoy.getFullYear();
+    const mes = hoy.getMonth();
 
-    if (eventos.length === 0) {
-        contenedor.innerHTML = `
-            <div class="sin-eventos">
-                <span>📅</span>
-                <span>Sin eventos próximos</span>
-            </div>
-        `;
-        return;
+    const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio",
+                   "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    mesAno.textContent = `${meses[mes]} ${anio}`;
+
+    const primerDia = new Date(anio, mes, 1).getDay();
+    const diasEnMes = new Date(anio, mes + 1, 0).getDate();
+
+    const diasSemana = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+    let html = diasSemana.map(d => `<div class="cal-dia-header">${d}</div>`).join("");
+
+    for (let i = 0; i < primerDia; i++) {
+        html += `<div class="cal-dia cal-dia-vacio"></div>`;
     }
 
-    contenedor.innerHTML = eventos.map(e => {
-        const hoy = esHoy(e.fecha_dia);
-        const horaHtml = e.hora ? `<span class="evento-hora">${e.hora}</span>` : "";
-        return `
-            <div class="evento-item ${hoy ? "evento-hoy" : ""}">
-                <div class="evento-fecha">
-                    <span class="evento-dia-nombre">${e.dia_semana}</span>
-                    <span class="evento-dia-numero">${e.fecha_dia.split("-")[2]}</span>
-                </div>
-                <div class="evento-info">
-                    <div class="evento-titulo">${e.titulo}</div>
+    const eventosPorDia = {};
+    eventos.forEach(e => {
+        const dia = parseInt(e.fecha_dia.split("-")[2]);
+        if (!eventosPorDia[dia]) eventosPorDia[dia] = [];
+        eventosPorDia[dia].push(e);
+    });
+
+    for (let d = 1; d <= diasEnMes; d++) {
+        const esHoy = d === hoy.getDate();
+        const tieneEvento = eventosPorDia[d];
+        let clase = "cal-dia";
+        if (esHoy) clase += " cal-dia-hoy";
+        if (tieneEvento) clase += " cal-dia-evento";
+        html += `<div class="${clase}">${d}</div>`;
+    }
+
+    grid.innerHTML = html;
+
+    const eventosHoyLista = eventosPorDia[hoy.getDate()] || [];
+    if (eventosHoyLista.length > 0) {
+        eventosHoy.innerHTML = eventosHoyLista.map(e => {
+            const horaHtml = e.hora ? `<span class="cal-evento-hora">${e.hora}</span>` : "";
+            return `
+                <div class="cal-evento-item cal-evento-item-hoy">
+                    <span class="cal-evento-titulo">${e.titulo}</span>
                     ${horaHtml}
                 </div>
-            </div>
-        `;
-    }).join("");
+            `;
+        }).join("");
+    } else {
+        eventosHoy.innerHTML = "";
+    }
 }
 
 function esHoy(fechaDia) {

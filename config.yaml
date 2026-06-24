@@ -11,8 +11,8 @@ weather:
   refresh_interval: 900
 
 calendar:
-  enabled: false
-  url: ""
+  enabled: true
+  url: "webcal://p34-caldav.icloud.com/published/2/MjAzMzEzOTg3OTkyMDMzMRQrZdVLaHB_Jr_GmUcHKH6snZm-ed5k65xuEL0v5xbBZz8LbrL2EI33mQJx0ZPn82f5JsQfHFfAghvAuLqD6Yg"
   refresh_interval: 3600
-  max_events: 7
-  days_ahead: 14
+  max_events: 31
+  days_ahead: 31

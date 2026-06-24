@@ -106,13 +106,14 @@ body {
 }
 
 .sensacion {
-    font-size: 1.3rem;
+    font-size: 1.8rem;
     color: #8b949e;
     margin-left: auto;
 }
 
 .sensacion span {
     color: #e6edf3;
+    font-size: 2rem;
 }
 
 .divisor {
@@ -141,8 +142,6 @@ body {
 .pronostico {
     display: flex;
     gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 5px;
     flex: 1;
 }
 
@@ -160,16 +159,15 @@ body {
 }
 
 .dia-pronostico {
-    flex: 0 0 auto;
+    flex: 1 1 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
     padding: 12px 14px;
     background: #161b22;
     border-radius: 10px;
     border: 1px solid #21262d;
-    min-width: 90px;
 }
 
 .dia-nombre {
@@ -201,96 +199,128 @@ body {
     overflow: hidden;
 }
 
-.calendario-eventos {
+.calendario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.cal-mes-ano {
+    font-size: 1.1rem;
+    color: #8b949e;
+    text-transform: capitalize;
+}
+
+.calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 3px;
+    flex: 1;
+}
+
+.cal-dia-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #484f58;
+    padding: 4px 0;
+}
+
+.cal-dia {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    padding: 6px 2px;
+    border-radius: 8px;
+    color: #8b949e;
+    background: #161b22;
+    border: 1px solid #21262d;
+    position: relative;
+}
+
+.cal-dia-hoy {
+    background: #238636;
+    color: #fff;
+    font-weight: 700;
+    border-color: #238636;
+}
+
+.cal-dia-evento {
+    color: #e6edf3;
+    font-weight: 600;
+}
+
+.cal-dia-evento::after {
+    content: "";
+    position: absolute;
+    bottom: 3px;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #58a6ff;
+}
+
+.cal-dia-vacio {
+    background: transparent;
+    border-color: transparent;
+}
+
+.calendario-eventos-hoy {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 4px;
+    margin-top: 8px;
     overflow-y: auto;
-    flex: 1;
+    max-height: 120px;
     padding-right: 4px;
 }
 
-.calendario-eventos::-webkit-scrollbar {
+.calendario-eventos-hoy::-webkit-scrollbar {
     width: 4px;
 }
 
-.calendario-eventos::-webkit-scrollbar-track {
+.calendario-eventos-hoy::-webkit-scrollbar-track {
     background: #161b22;
 }
 
-.calendario-eventos::-webkit-scrollbar-thumb {
+.calendario-eventos-hoy::-webkit-scrollbar-thumb {
     background: #30363d;
     border-radius: 2px;
 }
 
-.evento-item {
+.cal-evento-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px 12px;
+    gap: 8px;
+    padding: 6px 10px;
     background: #161b22;
-    border-radius: 10px;
-    border: 1px solid #21262d;
-    animation: fadeIn 0.5s ease-out;
-}
-
-.evento-hoy {
-    border-color: #238636;
-    background: linear-gradient(90deg, #161b22 0%, #112119 100%);
-}
-
-.evento-fecha {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-width: 46px;
-    padding: 6px 8px;
-    background: #0d1117;
     border-radius: 8px;
     border: 1px solid #21262d;
 }
 
-.evento-dia-nombre {
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #8b949e;
+.cal-evento-item-hoy {
+    border-color: #238636;
+    background: linear-gradient(90deg, #161b22 0%, #112119 100%);
 }
 
-.evento-dia-numero {
-    font-size: 1.5rem;
-    font-weight: 700;
+.cal-evento-titulo {
+    font-size: 0.95rem;
     color: #e6edf3;
-}
-
-.evento-info {
     flex: 1;
-    min-width: 0;
-}
-
-.evento-titulo {
-    font-size: 1.1rem;
-    font-weight: 500;
-    color: #e6edf3;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
-.evento-hora {
-    font-size: 0.95rem;
+.cal-evento-hora {
+    font-size: 0.85rem;
     color: #8b949e;
-}
-
-.sin-eventos {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    padding: 14px;
-    color: #484f58;
-    font-size: 1rem;
 }
 
 .galeria-seccion {

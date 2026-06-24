@@ -91,14 +91,28 @@ cat > "$CHROME_PREFS_DIR/Preferences" <<'EOF'
 }
 EOF
 
-cat > ~/.config/autostart/monitor-kiosk.desktop <<EOF
+CHROME_FLAGS="--kiosk --no-first-run --no-default-browser-check --disable-infobars --disable-session-crashed-bubble --disable-dev-shm-usage --start-fullscreen --disk-cache-dir=/tmp/chromium-cache http://localhost:5000"
+
+if [ -d "$HOME/.config/labwc" ]; then
+    echo "  Detectado: labwc (Wayland)"
+    echo "$CHROME_BIN $CHROME_FLAGS" >> "$HOME/.config/labwc/autostart"
+    KIOSK_AUTOSTART="$HOME/.config/labwc/autostart"
+elif [ -d "$HOME/.config/lxsession/LXDE-pi" ]; then
+    echo "  Detectado: LXDE (X11)"
+    echo "$CHROME_BIN $CHROME_FLAGS" >> "$HOME/.config/lxsession/LXDE-pi/autostart"
+    KIOSK_AUTOSTART="$HOME/.config/lxsession/LXDE-pi/autostart"
+else
+    echo "  Detectado: GNOME/standalone"
+    mkdir -p "$HOME/.config/autostart"
+    cat > "$HOME/.config/autostart/monitor-kiosk.desktop" <<EOF
 [Desktop Entry]
 Type=Application
 Name=Monitor Kiosk
-Comment=Navegador en modo kiosk para el dashboard
-Exec=$CHROME_BIN --kiosk --no-first-run --no-default-browser-check --disable-infobars --disable-session-crashed-bubble --disable-dev-shm-usage --start-fullscreen --disk-cache-dir=/tmp/chromium-cache http://localhost:5000
+Exec=$CHROME_BIN $CHROME_FLAGS
 X-GNOME-Autostart-enabled=true
 EOF
+    KIOSK_AUTOSTART="$HOME/.config/autostart/monitor-kiosk.desktop"
+fi
 
 echo ""
 echo "=== Instalación completa ==="
@@ -107,7 +121,7 @@ echo "Resumen:"
 echo "  - Entorno Python: venv en $PROJECT_DIR/venv"
 echo "  - Servicio: monitor-kiosk.service habilitado"
 echo "  - Galería: ~/Pictures/kiosk-gallery/"
-echo "  - Auto-arranque: ~/.config/autostart/monitor-kiosk.desktop"
+echo "  - Auto-arranque: $KIOSK_AUTOSTART"
 echo "  - Usuario: $CURRENT_USER"
 echo ""
 echo "Pasos siguientes:"
